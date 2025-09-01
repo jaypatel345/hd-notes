@@ -1,17 +1,26 @@
-// src/App.tsx
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route, Navigate } from "react-router-dom";
 import Signup from "./pages/Signup";
 import Signin from "./pages/signin";
-// import Signin from "./pages/Signin";
-// import Home from "./pages/Home";
+import Dashboard from "./pages/dashboard";
+import { useAuth } from "./context/AuthContext";
 
 function App() {
+  const { user, signout } = useAuth();
+
   return (
     <Routes>
       <Route path="/" element={<Signup />} />
       <Route path="/signin" element={<Signin />} />
-      {/* <Route path="/signin" element={<Signin />} />
-      <Route path="*" element={<NotFound />} /> */}
+      <Route
+        path="/dashboard"
+        element={
+          user ? (
+            <Dashboard user={user} onSignOut={signout} />
+          ) : (
+            <Navigate to="/signin" />
+          )
+        }
+      />
     </Routes>
   );
 }

@@ -2,62 +2,52 @@ import { useState } from "react";
 import HDLogo from "./HDLogo";
 import { Eye, EyeClosed } from "lucide-react";
 
-interface SignUpFormProps {
+interface SignInFormProps {
   onSubmit: (data: any) => void;
   onSwitchToSignIn: () => void;
 }
 
-const SignUpForm = ({ onSubmit, onSwitchToSignIn }: SignUpFormProps) => {
-  
-  
-
+const SignInForm = ({ onSubmit, onSwitchToSignIn }: SignInFormProps) => {
   const [showOTPValue, setShowOTPValue] = useState(false);
 
   const toggleOTPVisibility = () => {
     setShowOTPValue((prev) => !prev);
   };
 
-  
-  
-
-  const handleSignUp = () => {
-    if (validateForm()) onSubmit(formData);
-  };
-
   const [formData, setFormData] = useState({
-    email: '',
-    otp: '',
-    keepLoggedIn: false
+    email: "",
+    otp: "",
+    keepLoggedIn: false,
   });
-  
+
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
-    
+
     if (!formData.email.trim()) {
-      newErrors.email = 'Email is required';
+      newErrors.email = "Email is required";
     } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
-      newErrors.email = 'Invalid email format';
+      newErrors.email = "Invalid email format";
     }
 
     if (!formData.otp.trim()) {
-      newErrors.otp = 'OTP is required';
+      newErrors.otp = "OTP is required";
     }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-//   const handleSignIn = () => {
-//     if (validateForm()) {
-//       onSubmit(formData);
-//     }
-//   };
+    const handleSignIn = () => {
+      if (validateForm()) {
+        onSubmit(formData);
+      }
+    };
 
   const handleResendOTP = () => {
     if (formData.email) {
-      alert('OTP resent to your email!');
+      alert("OTP resent to your email!");
     }
   };
 
@@ -80,45 +70,6 @@ const SignUpForm = ({ onSubmit, onSwitchToSignIn }: SignUpFormProps) => {
         </p>
 
         <div className="space-y-8 relative">
-          {/* Full Name */}
-          {/* <div>
-            <label className="block text-[12px] text-[#969696] mb-1 absolute left-2.5 -top-2.5 px-1  bg-white">
-              Full name
-            </label>
-            <input
-              type="text"
-              placeholder="Jonas Kahnwald"
-              value={formData.fullName}
-              onChange={(e) =>
-                setFormData({ ...formData, fullName: e.target.value })
-              }
-              className="w-full px-3 py-3 border border-[#E6E6E6] rounded-lg text-[16px]"
-            />
-            {errors.fullName && (
-              <p className="text-red-500 text-sm">{errors.fullName}</p>
-            )}
-          </div> */}
-
-          {/* DOB */}
-          {/* <div className="relative">
-            <label className="block text-[12px] text-[#969696] mb-1 absolute left-2.5 -top-2.5 px-1 z-10  bg-white">
-              Date of Birth
-            </label>
-            <div className="relative">
-              <input
-                type="date"
-                value={formData.dateOfBirth}
-                onChange={(e) =>
-                  setFormData({ ...formData, dateOfBirth: e.target.value })
-                }
-                className="w-full px-3 py-3 border border-[#E6E6E6] rounded-lg text-[16px]"
-              />
-            </div>
-            {errors.dateOfBirth && (
-              <p className="text-red-500 text-sm">{errors.dateOfBirth}</p>
-            )}
-          </div> */}
-
           {/* Email */}
           <div className="relative">
             <label className="block text-[14px] text-[#969696] mb-1 absolute left-2.5 -top-2.5 px-1 z-10  bg-white">
@@ -189,7 +140,7 @@ const SignUpForm = ({ onSubmit, onSwitchToSignIn }: SignUpFormProps) => {
 
           {/* Buttons */}
           <button
-            onClick={handleSignUp}
+            onClick={handleSignIn}
             className="w-full bg-[#1677FF] text-white py-3 rounded-lg font-medium hover:bg-[#1666dd] transition-colors"
           >
             Sign in
@@ -210,4 +161,4 @@ const SignUpForm = ({ onSubmit, onSwitchToSignIn }: SignUpFormProps) => {
   );
 };
 
-export default SignUpForm;
+export default SignInForm;
