@@ -1,9 +1,9 @@
 import React, { useState } from "react";
 import { Plus, Trash2, LogOut } from "lucide-react"; // Icon library
-import HDLogo from "../components/HDLogo"; // adjust path if needed
 import { mockNotes } from "../types/index"; // adjust path if needed
+import logo from "../assets/icon.png";
 
-// Types
+
 type User = {
   name: string;
   email: string;
@@ -45,34 +45,22 @@ const Dashboard: React.FC<DashboardProps> = ({ user, onSignOut }) => {
   };
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* Mobile Header */}
-      <div className="bg-white shadow-sm p-4 flex items-center justify-between md:hidden">
-        <HDLogo />
-        <div className="flex items-center space-x-4 relative z-50">
-          <span className="text-sm font-medium">Dashboard</span>
-          <button
-            onClick={onSignOut}
-            className="text-gray-600 hover:text-gray-800"
-          >
-            <LogOut className="w-5 h-5" />
-          </button>
-        </div>
-      </div>
-
+    <div className="min-h-screen ">
+     
       {/* Desktop/Mobile Layout */}
-     <div className="max-w-md mx-auto bg-white min-h-screen md:max-w-lg md:my-8 md:rounded-2xl md:shadow-xl md:min-h-0">
+      <div className="max-w-md mx-auto  rounded-2xl min-h-0 shadow-xl   md:max-w-lg md:my-8 md:rounded-2xl md:shadow-xl md:min-h-0">
         {/* Header */}
         <div className="p-6 border-b border-gray-200 flex items-center justify-between">
-          <div className="hidden md:block">
-            <HDLogo />
+          {/* Left: Logo + Dashboard */}
+          <div className="flex items-center space-x-4">
+            <img src={logo} alt="HD Logo" className="w-[32px] h-[32px]" />
+            <h1 className="text-xl font-bold text-gray-900">Dashboard</h1>
           </div>
-          <h1 className="text-xl font-bold text-gray-900 md:hidden">
-            Dashboard
-          </h1>
+
+          {/* Right: Sign Out */}
           <button
             onClick={onSignOut}
-            className="hidden md:flex items-center space-x-2 text-gray-600 hover:text-gray-800 transition-colors"
+            className="flex items-center space-x-1 text-[#3679FE] hover:text-[#3679FE]/80 cursor-pointer transition-colors"
           >
             <LogOut className="w-5 h-5" />
             <span>Sign Out</span>
