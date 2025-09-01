@@ -1,24 +1,18 @@
-import Container from "./components/Container";
-import SignUpForm from "./components/SignUpForm";
+// src/App.tsx
+import { Routes, Route } from "react-router-dom";
+import Signup from "./pages/Signup";
+import Signin from "./pages/signin";
+// import Signin from "./pages/Signin";
+// import Home from "./pages/Home";
 
 function App() {
-  const handleSignUp = (data: any) => {
-    console.log("User signed up:", data);
-  };
-
-  const handleSwitchToSignIn = () => {
-    console.log("Switch to Sign In");
-  };
-
   return (
-    <div className="flex min-h-screen h-full">
-      <div className="flex-1 flex justify-center items-center bg-white h-screen">
-        <SignUpForm onSubmit={handleSignUp} onSwitchToSignIn={handleSwitchToSignIn} />
-      </div>
-      <div className="flex-1 hidden md:block">
-        <Container />
-      </div>
-    </div>
+    <Routes>
+      <Route path="/" element={<Signup />} />
+      <Route path="/signin" element={<Signin />} />
+      {/* <Route path="/signin" element={<Signin />} />
+      <Route path="*" element={<NotFound />} /> */}
+    </Routes>
   );
 }
 
