@@ -11,7 +11,7 @@ function App() {
   };
 
   return (
-    <div className="flex min-h-screen ">
+    <div className="flex min-h-screen h-full">
       <div className="flex-1 flex justify-center items-center bg-white h-screen">
         <SignUpForm onSubmit={handleSignUp} onSwitchToSignIn={handleSwitchToSignIn} />
       </div>

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import HDLogo from "./HDLogo";
+import { Eye, EyeClosed } from "lucide-react";
 
 interface SignUpFormProps {
   onSubmit: (data: any) => void;
@@ -15,6 +16,12 @@ const SignUpForm = ({ onSubmit, onSwitchToSignIn }: SignUpFormProps) => {
   });
   const [showOTP, setShowOTP] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const [showOTPValue, setShowOTPValue] = useState(false);
+
+  const toggleOTPVisibility = () => {
+    setShowOTPValue((prev) => !prev);
+  };
 
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
@@ -44,20 +51,20 @@ const SignUpForm = ({ onSubmit, onSwitchToSignIn }: SignUpFormProps) => {
   };
 
   return (
-    <div className="w-[527px] h-[928px] p-16 flex flex-col ">
-      <div className="flex justify-start mb-8">
+    <div className="w-full max-w-[527px] min-h-screen p-6 sm:p-16 flex flex-col mx-auto justify-center">
+      <div className="flex justify-center mb-8">
         <HDLogo />
       </div>
       <div className="flex-1 flex flex-col justify-center space-y-8">
         <h1
-          className="font-bold text-[#232323] mb-2 text-[40px] text-shadow-black"
+          className="font-bold text-[#232323] mb-2 text-[28px] sm:text-[40px] text-shadow-black text-center sm:text-left"
           style={{
             textShadow: "0px 4px 4px rgba(0, 0, 0, 0.25)",
           }}
         >
           Sign up
         </h1>
-        <p className="mb-8 text-[18px] text-[#969696] ">
+        <p className="mb-8 text-[16px] sm:text-[18px] text-[#969696] text-center sm:text-left">
           Sign up to enjoy the feature of HD
         </p>
 
@@ -95,7 +102,6 @@ const SignUpForm = ({ onSubmit, onSwitchToSignIn }: SignUpFormProps) => {
                 }
                 className="w-full px-3 py-3 border border-[#E6E6E6] rounded-lg text-[16px]"
               />
-             
             </div>
             {errors.dateOfBirth && (
               <p className="text-red-500 text-sm">{errors.dateOfBirth}</p>
@@ -121,15 +127,14 @@ const SignUpForm = ({ onSubmit, onSwitchToSignIn }: SignUpFormProps) => {
             )}
           </div>
 
-          {/* OTP */}
           {showOTP && (
-            <div>
-              <label className="block text-[14px] text-[#969696] mb-1 absolute left-2.5 -top-2.5 px-1 z-10  bg-white">
+            <div className="relative">
+              <label className="block text-[14px] text-[#969696] mb-1 absolute left-2.5 -top-2.5 px-1 z-10 bg-white">
                 OTP
               </label>
               <div className="relative">
                 <input
-                  type="text"
+                  type={showOTPValue ? "text" : "password"}
                   placeholder="Enter OTP"
                   value={formData.otp}
                   onChange={(e) =>
@@ -137,9 +142,22 @@ const SignUpForm = ({ onSubmit, onSwitchToSignIn }: SignUpFormProps) => {
                   }
                   className="w-full px-4 py-3 border border-[#E6E6E6] rounded-lg text-[16px]"
                 />
-               
+
+                {showOTPValue ? (
+                  <EyeClosed
+                    onClick={toggleOTPVisibility}
+                    className="absolute right-3 top-3 w-5 h-5 text-gray-400 cursor-pointer"
+                  />
+                ) : (
+                  <Eye
+                    onClick={toggleOTPVisibility}
+                    className="absolute right-3 top-3 w-5 h-5 text-gray-400 cursor-pointer"
+                  />
+                )}
               </div>
-              {errors.otp && <p className="text-red-500 text-sm">{errors.otp}</p>}
+              {errors.otp && (
+                <p className="text-red-500 text-sm">{errors.otp}</p>
+              )}
             </div>
           )}
 
