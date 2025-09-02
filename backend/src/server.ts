@@ -18,8 +18,20 @@ const PORT = process.env.PORT || 5000;
 
 // Security middleware
 app.use(helmet());
+
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://hd-notes-flame.vercel.app"
+];
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL || "https://hd-notes-flame.vercel.app/",
+  origin: (origin, callback) => {
+    if (!origin || allowedOrigins.includes(origin)) {
+      callback(null, true);
+    } else {
+      callback(new Error("Not allowed by CORS"));
+    }
+  },
   credentials: true
 }));
 
