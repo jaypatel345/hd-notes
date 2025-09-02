@@ -38,7 +38,7 @@ hd-notes/
 - `PUT /api/notes/:id` → Update a note  
 - `DELETE /api/notes/:id` → Delete a note  
 
-## ⚡ Getting Started
+## Getting Started
 
 ### 1. Clone the repository
 ```bash
@@ -80,7 +80,7 @@ http://localhost:5173
 ```
 
 ## Project Link
-[HD Notes Live]((https://hd-notes-flame.vercel.app/))
+[HD Notes Live](https://hd-notes-flame.vercel.app)
 
 ---
-✨ Built with passion for secure and modern note management.
+Built with passion for secure and modern note management.
