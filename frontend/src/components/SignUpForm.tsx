@@ -7,6 +7,8 @@ interface SignUpFormProps {
   onSubmit: (data: any) => void;
   onSwitchToSignIn: () => void;
 }
+const API_URL = import.meta.env.VITE_API_URL;
+
 
 const SignUpForm = ({  onSwitchToSignIn }: SignUpFormProps) => {
   const navigate = useNavigate();
@@ -47,7 +49,7 @@ const SignUpForm = ({  onSwitchToSignIn }: SignUpFormProps) => {
     if (!validateForm()) return;
 
     try {
-      const response = await fetch("http://localhost:3000/api/auth/signup", {
+      const response = await fetch(`${API_URL}/api/auth/signup`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -77,7 +79,7 @@ const SignUpForm = ({  onSwitchToSignIn }: SignUpFormProps) => {
     if (!validateForm()) return;
 
     try {
-      const response = await fetch("http://localhost:3000/api/auth/verify-otp", {
+      const response = await fetch(`${API_URL}/api/auth/verify-otp`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",

@@ -13,6 +13,7 @@ type Note = {
   content: string;
   createdAt: string;
 };
+const API_URL = import.meta.env.VITE_API_URL;
 
 interface DashboardProps {
   user: User;
@@ -33,7 +34,7 @@ const Dashboard: React.FC<DashboardProps> = ({
       try {
         const token = localStorage.getItem("token");
         if (!token) return;
-        const res = await fetch("http://localhost:3000/api/user/profile", {
+        const res = await fetch(`${API_URL}/api/user/profile`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -57,7 +58,7 @@ const Dashboard: React.FC<DashboardProps> = ({
       try {
         const token = localStorage.getItem("token");
         if (!token) return;
-        const res = await fetch("http://localhost:3000/api/notes", {
+        const res = await fetch(`${API_URL}/api/notes`, {
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -77,7 +78,7 @@ const Dashboard: React.FC<DashboardProps> = ({
       try {
         const token = localStorage.getItem("token");
         if (!token) return;
-        const res = await fetch("http://localhost:3000/api/notes", {
+        const res = await fetch(`${API_URL}/api/notes`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -100,7 +101,7 @@ const Dashboard: React.FC<DashboardProps> = ({
     try {
       const token = localStorage.getItem("token");
       if (!token) return;
-      const res = await fetch(`http://localhost:3000/api/notes/${id}`, {
+      const res = await fetch(`${API_URL}/api/notes/${id}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",

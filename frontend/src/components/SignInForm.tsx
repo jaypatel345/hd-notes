@@ -6,6 +6,8 @@ import { Link, useNavigate } from "react-router-dom";
 interface SignInFormProps {
   onSwitchToSignIn: () => void;
 }
+const API_URL = import.meta.env.VITE_API_URL;
+
 
 const SignInForm = ({ onSwitchToSignIn }: SignInFormProps) => {
   const [showOTPValue, setShowOTPValue] = useState(false);
@@ -44,7 +46,7 @@ const SignInForm = ({ onSwitchToSignIn }: SignInFormProps) => {
   const handleSignIn = async () => {
     if (validateForm()) {
       try {
-        const response = await fetch("http://localhost:3000/api/auth/signin", {
+        const response = await fetch(`${API_URL}/api/auth/signin`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
@@ -75,7 +77,7 @@ const SignInForm = ({ onSwitchToSignIn }: SignInFormProps) => {
     if (formData.email) {
       try {
         const response = await fetch(
-          "http://localhost:3000/api/auth/request-login-otp",
+          `${API_URL}/api/auth/request-login-otp`,
           {
             method: "POST",
             headers: {
