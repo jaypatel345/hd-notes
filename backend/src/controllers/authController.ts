@@ -23,9 +23,6 @@ const generateToken = (userId: string): string => {
 
 // Generate OTP
 const generateOTP = (): string => {
-  if (process.env.NODE_ENV === 'development') {
-    return "123456";
-  }
   return crypto.randomInt(100000, 999999).toString();
 };
 
@@ -44,7 +41,7 @@ export const signup = async (req: Request, res: Response) => {
 
     // Check if user already exists
     const existingUser = await User.findOne({ email });
-    if (existingUser && existingUser.isVerified) {
+    if (existingUser) {
       return res.status(400).json({
         success: false,
         message: 'User already exists with this email'
@@ -56,7 +53,7 @@ export const signup = async (req: Request, res: Response) => {
     const otpExpires = new Date(Date.now() + 10 * 60 * 1000); // 10 minutes
 
     let user: IUser;
-    if (existingUser && !existingUser.isVerified) {
+    if (existingUser ) {
       // Update existing unverified user
       user = existingUser;
       user.name = name;
@@ -310,7 +307,7 @@ export const resendOTP = async (req: Request, res: Response) => {
   try {
     const { email } = req.body;
 
-    const user = await User.findOne({ email, isVerified: false });
+    const user = await User.findOne({ email, isVerified: true });
     if (!user) {
       return res.status(404).json({
         success: false,

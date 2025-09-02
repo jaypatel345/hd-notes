@@ -55,9 +55,12 @@ const SignInForm = ({ onSwitchToSignIn }: SignInFormProps) => {
         const data = await response.json();
 
         if (response.ok) {
-          if (formData.keepLoggedIn && data.token) {
-            localStorage.setItem("token", data.token);
+          // Always store token and user data in localStorage
+          if (data.data?.token) {
+            localStorage.setItem("token", data.data.token);
+            localStorage.setItem("user", JSON.stringify(data.data.user));
           }
+          console.log(data.data.token);
           navigate("/dashboard");
         } else {
           setMessage(data.message || "Sign in failed");
@@ -71,13 +74,16 @@ const SignInForm = ({ onSwitchToSignIn }: SignInFormProps) => {
   const handleResendOTP = async () => {
     if (formData.email) {
       try {
-        const response = await fetch("http://localhost:3000/api/auth/request-login-otp", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ email: formData.email }),
-        });
+        const response = await fetch(
+          "http://localhost:3000/api/auth/request-login-otp",
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({ email: formData.email }),
+          }
+        );
 
         const data = await response.json();
 
@@ -193,12 +199,12 @@ const SignInForm = ({ onSwitchToSignIn }: SignInFormProps) => {
           <div className="text-center text-[14px] text-[#969696]">
             <span>Need an account? </span>
             <Link to="/">
-            <button
-              onClick={onSwitchToSignIn}
-              className="text-blue-600 hover:underline font-medium"
-            >
-              Create one
-            </button>
+              <button
+                onClick={onSwitchToSignIn}
+                className="text-blue-600 hover:underline font-medium"
+              >
+                Create one
+              </button>
             </Link>
           </div>
         </div>

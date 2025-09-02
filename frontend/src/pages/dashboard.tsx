@@ -2,7 +2,6 @@ import React, { useState, useEffect } from "react";
 import { Plus, Trash2, LogOut } from "lucide-react"; // Icon library
 import logo from "../assets/icon.png";
 
-
 type User = {
   name: string;
   email: string;
@@ -20,7 +19,10 @@ interface DashboardProps {
   onSignOut: () => void;
 }
 
-const Dashboard: React.FC<DashboardProps> = ({ user: initialUser, onSignOut }) => {
+const Dashboard: React.FC<DashboardProps> = ({
+  user: initialUser,
+  onSignOut,
+}) => {
   const [user, setUser] = useState<User>(initialUser);
   const [notes, setNotes] = useState<Note[]>([]);
   const [showCreateNote, setShowCreateNote] = useState(false);
@@ -33,12 +35,15 @@ const Dashboard: React.FC<DashboardProps> = ({ user: initialUser, onSignOut }) =
         if (!token) return;
         const res = await fetch("http://localhost:3000/api/user/profile", {
           headers: {
-            "Authorization": `Bearer ${token}`,
+            Authorization: `Bearer ${token}`,
           },
         });
         if (!res.ok) throw new Error("Failed to fetch user profile");
         const profile = await res.json();
-        setUser(profile);
+        setUser({
+          name: profile.data.name,
+          email: profile.data.email,
+        });
       } catch (error) {
         console.error("Error fetching user profile:", error);
       }
@@ -50,10 +55,16 @@ const Dashboard: React.FC<DashboardProps> = ({ user: initialUser, onSignOut }) =
   useEffect(() => {
     const fetchNotes = async () => {
       try {
-        const res = await fetch("http://localhost:3000/api/notes");
+        const token = localStorage.getItem("token");
+        if (!token) return;
+        const res = await fetch("http://localhost:3000/api/notes", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         if (!res.ok) throw new Error("Failed to fetch notes");
         const data = await res.json();
-        setNotes(data);
+        setNotes(data.data || []);
       } catch (error) {
         console.error("Error fetching notes:", error);
       }
@@ -64,16 +75,19 @@ const Dashboard: React.FC<DashboardProps> = ({ user: initialUser, onSignOut }) =
   const handleCreateNote = async () => {
     if (newNote.title.trim() && newNote.content.trim()) {
       try {
+        const token = localStorage.getItem("token");
+        if (!token) return;
         const res = await fetch("http://localhost:3000/api/notes", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify(newNote),
         });
         if (!res.ok) throw new Error("Failed to create note");
         const createdNote = await res.json();
-        setNotes([...notes, createdNote]);
+        setNotes([...notes, createdNote.data]);
         setNewNote({ title: "", content: "" });
         setShowCreateNote(false);
       } catch (error) {
@@ -84,10 +98,13 @@ const Dashboard: React.FC<DashboardProps> = ({ user: initialUser, onSignOut }) =
 
   const handleDeleteNote = async (id: string) => {
     try {
+      const token = localStorage.getItem("token");
+      if (!token) return;
       const res = await fetch(`http://localhost:3000/api/notes/${id}`, {
         method: "DELETE",
         headers: {
           "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
         },
       });
       if (!res.ok) throw new Error("Failed to delete note");
@@ -99,7 +116,6 @@ const Dashboard: React.FC<DashboardProps> = ({ user: initialUser, onSignOut }) =
 
   return (
     <div className="min-h-screen ">
-     
       {/* Desktop/Mobile Layout */}
       <div className="max-w-md mx-auto  rounded-2xl min-h-0 shadow-xl   md:max-w-lg md:my-8 md:rounded-2xl md:shadow-xl md:min-h-0">
         {/* Header */}
