@@ -1,14 +1,16 @@
 import { useState } from "react";
 import HDLogo from "./HDLogo";
 import { Eye, EyeClosed } from "lucide-react";
+import { Link, useNavigate } from "react-router-dom";
 
 interface SignInFormProps {
-  onSubmit: (data: any) => void;
   onSwitchToSignIn: () => void;
 }
 
-const SignInForm = ({ onSubmit, onSwitchToSignIn }: SignInFormProps) => {
+const SignInForm = ({ onSwitchToSignIn }: SignInFormProps) => {
   const [showOTPValue, setShowOTPValue] = useState(false);
+  const [message, setMessage] = useState("");
+  const navigate = useNavigate();
 
   const toggleOTPVisibility = () => {
     setShowOTPValue((prev) => !prev);
@@ -39,15 +41,54 @@ const SignInForm = ({ onSubmit, onSwitchToSignIn }: SignInFormProps) => {
     return Object.keys(newErrors).length === 0;
   };
 
-    const handleSignIn = () => {
-      if (validateForm()) {
-        onSubmit(formData);
-      }
-    };
+  const handleSignIn = async () => {
+    if (validateForm()) {
+      try {
+        const response = await fetch("http://localhost:3000/api/auth/signin", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email: formData.email, otp: formData.otp }),
+        });
 
-  const handleResendOTP = () => {
+        const data = await response.json();
+
+        if (response.ok) {
+          if (formData.keepLoggedIn && data.token) {
+            localStorage.setItem("token", data.token);
+          }
+          navigate("/dashboard");
+        } else {
+          setMessage(data.message || "Sign in failed");
+        }
+      } catch (error) {
+        setMessage("An error occurred. Please try again.");
+      }
+    }
+  };
+
+  const handleResendOTP = async () => {
     if (formData.email) {
-      alert("OTP resent to your email!");
+      try {
+        const response = await fetch("http://localhost:3000/api/auth/request-login-otp", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email: formData.email }),
+        });
+
+        const data = await response.json();
+
+        if (response.ok) {
+          setMessage("OTP resent to your email!");
+        } else {
+          setMessage(data.message || "Failed to resend OTP");
+        }
+      } catch (error) {
+        setMessage("An error occurred. Please try again.");
+      }
     }
   };
 
@@ -118,6 +159,9 @@ const SignInForm = ({ onSubmit, onSwitchToSignIn }: SignInFormProps) => {
             </div>
             {errors.otp && <p className="text-red-500 text-sm">{errors.otp}</p>}
           </div>
+          {message && (
+            <p className="text-center text-green-600/80 text-sm">{message}</p>
+          )}
           <div className="flex items-center justify-between">
             <label className="flex items-center">
               <input
@@ -132,7 +176,7 @@ const SignInForm = ({ onSubmit, onSwitchToSignIn }: SignInFormProps) => {
             </label>
             <button
               onClick={handleResendOTP}
-              className="text-sm text-blue-600 hover:underline"
+              className="text-sm text-blue-600 hover:underline cursor-pointer"
             >
               Resend OTP
             </button>
@@ -141,19 +185,21 @@ const SignInForm = ({ onSubmit, onSwitchToSignIn }: SignInFormProps) => {
           {/* Buttons */}
           <button
             onClick={handleSignIn}
-            className="w-full bg-[#1677FF] text-white py-3 rounded-lg font-medium hover:bg-[#1666dd] transition-colors"
+            className="w-full bg-[#1677FF] text-white py-3 cursor-pointer rounded-lg font-medium hover:bg-[#1666dd] transition-colors"
           >
             Sign in
           </button>
 
           <div className="text-center text-[14px] text-[#969696]">
             <span>Need an account? </span>
+            <Link to="/">
             <button
               onClick={onSwitchToSignIn}
               className="text-blue-600 hover:underline font-medium"
             >
               Create one
             </button>
+            </Link>
           </div>
         </div>
       </div>

@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 import HDLogo from "./HDLogo";
 import { Eye, EyeClosed } from "lucide-react";
 
@@ -8,6 +9,7 @@ interface SignUpFormProps {
 }
 
 const SignUpForm = ({  onSwitchToSignIn }: SignUpFormProps) => {
+  const navigate = useNavigate();
   const [formData, setFormData] = useState({
     fullName: "",
     dateOfBirth: "",
@@ -18,6 +20,8 @@ const SignUpForm = ({  onSwitchToSignIn }: SignUpFormProps) => {
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const [showOTPValue, setShowOTPValue] = useState(false);
+
+  const [message, setMessage] = useState("");
 
   const toggleOTPVisibility = () => {
     setShowOTPValue((prev) => !prev);
@@ -39,17 +43,7 @@ const SignUpForm = ({  onSwitchToSignIn }: SignUpFormProps) => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleGetOTP = () => {
-    if (validateForm()) {
-      setShowOTP(true);
-      alert("OTP sent to your email!");
-    }
-  };
-
-  // const handleSignUp = () => {
-  //   if (validateForm()) onSubmit(formData);
-  // };
-    const handleSignUp = async () => {
+  const handleGetOTP = async () => {
     if (!validateForm()) return;
 
     try {
@@ -66,10 +60,47 @@ const SignUpForm = ({  onSwitchToSignIn }: SignUpFormProps) => {
       });
 
       const data = await response.json();
+      if (response.ok) {
+        setShowOTP(true);
+        setMessage("OTP sent to your email!");
+      } else {
+        setMessage(data.message || "Failed to send OTP.");
+      }
       console.log("Signup response:", data);
     } catch (error) {
       console.error("Signup error:", error);
-    }}
+      setMessage("An error occurred while sending OTP.");
+    }
+  };
+
+  const handleSignUp = async () => {
+    if (!validateForm()) return;
+
+    try {
+      const response = await fetch("http://localhost:3000/api/auth/verify-otp", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          email: formData.email,
+          otp: formData.otp,
+        }),
+      });
+
+      const data = await response.json();
+      if (response.ok) {
+        console.log("OTP verification successful:", data);
+        setMessage("OTP verified successfully! You are signed up.");
+        navigate("/signin");
+      } else {
+        setMessage(data.message || "Invalid OTP.");
+      }
+    } catch (error) {
+      console.error("OTP verification error:", error);
+      setMessage("An error occurred while verifying OTP.");
+    }
+  };
   return (
     <div className="w-full max-w-[527px] min-h-screen p-6 sm:p-16 flex flex-col mx-auto justify-center">
       <div className="flex justify-center mb-8">
@@ -181,31 +212,37 @@ const SignUpForm = ({  onSwitchToSignIn }: SignUpFormProps) => {
             </div>
           )}
 
+          {message && (
+            <p className="text-green-600 text-center text-sm">{message}</p>
+          )}
+
           {/* Buttons */}
           {!showOTP ? (
             <button
-              onClick={handleGetOTP}
+              onClick={(e) => { e.preventDefault(); handleGetOTP(); }}
               className="w-full bg-[#1677FF] text-white py-3 rounded-lg font-medium hover:bg-[#1666dd] transition-colors"
             >
               Get OTP
             </button>
           ) : (
             <button
-              onClick={handleSignUp}
+              onClick={(e) => { e.preventDefault(); handleSignUp(); }}
               className="w-full bg-[#1677FF] text-white py-3 rounded-lg font-medium hover:bg-[#1666dd] transition-colors"
             >
-              Sign up
+              Verify OTP
             </button>
           )}
 
           <div className="text-center text-[14px] text-[#969696]">
             <span>Already have an account? </span>
+            <Link to="/signin">
             <button
               onClick={onSwitchToSignIn}
               className="text-blue-600 hover:underline font-medium"
             >
               Sign in
             </button>
+            </Link>
           </div>
         </div>
       </div>

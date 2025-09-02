@@ -1,6 +1,5 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Plus, Trash2, LogOut } from "lucide-react"; // Icon library
-import { mockNotes } from "../types/index"; // adjust path if needed
 import logo from "../assets/icon.png";
 
 
@@ -21,27 +20,81 @@ interface DashboardProps {
   onSignOut: () => void;
 }
 
-const Dashboard: React.FC<DashboardProps> = ({ user, onSignOut }) => {
-  const [notes, setNotes] = useState<Note[]>(mockNotes);
+const Dashboard: React.FC<DashboardProps> = ({ user: initialUser, onSignOut }) => {
+  const [user, setUser] = useState<User>(initialUser);
+  const [notes, setNotes] = useState<Note[]>([]);
   const [showCreateNote, setShowCreateNote] = useState(false);
   const [newNote, setNewNote] = useState({ title: "", content: "" });
+  // Fetch authenticated user profile on mount
+  useEffect(() => {
+    const fetchUserProfile = async () => {
+      try {
+        const token = localStorage.getItem("token");
+        if (!token) return;
+        const res = await fetch("http://localhost:3000/api/user/profile", {
+          headers: {
+            "Authorization": `Bearer ${token}`,
+          },
+        });
+        if (!res.ok) throw new Error("Failed to fetch user profile");
+        const profile = await res.json();
+        setUser(profile);
+      } catch (error) {
+        console.error("Error fetching user profile:", error);
+      }
+    };
+    fetchUserProfile();
+  }, []);
 
-  const handleCreateNote = () => {
+  // Fetch notes from API when component mounts
+  useEffect(() => {
+    const fetchNotes = async () => {
+      try {
+        const res = await fetch("http://localhost:3000/api/notes");
+        if (!res.ok) throw new Error("Failed to fetch notes");
+        const data = await res.json();
+        setNotes(data);
+      } catch (error) {
+        console.error("Error fetching notes:", error);
+      }
+    };
+    fetchNotes();
+  }, []);
+
+  const handleCreateNote = async () => {
     if (newNote.title.trim() && newNote.content.trim()) {
-      const note: Note = {
-        id: (notes.length + 1).toString(),
-        title: newNote.title,
-        content: newNote.content,
-        createdAt: new Date().toISOString().split("T")[0],
-      };
-      setNotes([...notes, note]);
-      setNewNote({ title: "", content: "" });
-      setShowCreateNote(false);
+      try {
+        const res = await fetch("http://localhost:3000/api/notes", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(newNote),
+        });
+        if (!res.ok) throw new Error("Failed to create note");
+        const createdNote = await res.json();
+        setNotes([...notes, createdNote]);
+        setNewNote({ title: "", content: "" });
+        setShowCreateNote(false);
+      } catch (error) {
+        console.error("Error creating note:", error);
+      }
     }
   };
 
-  const handleDeleteNote = (id: string) => {
-    setNotes(notes.filter((note) => note.id !== id));
+  const handleDeleteNote = async (id: string) => {
+    try {
+      const res = await fetch(`http://localhost:3000/api/notes/${id}`, {
+        method: "DELETE",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+      if (!res.ok) throw new Error("Failed to delete note");
+      setNotes(notes.filter((note) => note.id !== id));
+    } catch (error) {
+      console.error("Error deleting note:", error);
+    }
   };
 
   return (
