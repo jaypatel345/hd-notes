@@ -6,7 +6,8 @@ import {
   verifyOTP,
   signin,
   googleAuth,
-  resendOTP
+  resendOTP,
+  requestLoginOTP
 } from '../controllers/authController';
 
 const router = express.Router();
@@ -36,6 +37,6 @@ router.post('/google', googleAuth);
 // Google OAuth callback route
 router.get('/google/callback', googleAuth);
 router.post('/resend-otp', [body('email').isEmail().normalizeEmail()], resendOTP);
+router.post('/request-login-otp', [body('email').isEmail().normalizeEmail()], requestLoginOTP);
 
 export default router;
-

@@ -7,7 +7,7 @@ interface SignUpFormProps {
   onSwitchToSignIn: () => void;
 }
 
-const SignUpForm = ({ onSubmit, onSwitchToSignIn }: SignUpFormProps) => {
+const SignUpForm = ({  onSwitchToSignIn }: SignUpFormProps) => {
   const [formData, setFormData] = useState({
     fullName: "",
     dateOfBirth: "",
@@ -46,10 +46,30 @@ const SignUpForm = ({ onSubmit, onSwitchToSignIn }: SignUpFormProps) => {
     }
   };
 
-  const handleSignUp = () => {
-    if (validateForm()) onSubmit(formData);
-  };
+  // const handleSignUp = () => {
+  //   if (validateForm()) onSubmit(formData);
+  // };
+    const handleSignUp = async () => {
+    if (!validateForm()) return;
 
+    try {
+      const response = await fetch("http://localhost:3000/api/auth/signup", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: formData.fullName,
+          email: formData.email,
+          dateOfBirth: new Date(formData.dateOfBirth).toISOString(),
+        }),
+      });
+
+      const data = await response.json();
+      console.log("Signup response:", data);
+    } catch (error) {
+      console.error("Signup error:", error);
+    }}
   return (
     <div className="w-full max-w-[527px] min-h-screen p-6 sm:p-16 flex flex-col mx-auto justify-center">
       <div className="flex justify-center mb-8">
