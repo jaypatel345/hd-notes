@@ -13,6 +13,7 @@ const SignInForm = ({ onSwitchToSignIn }: SignInFormProps) => {
   const [showOTPValue, setShowOTPValue] = useState(false);
   const [message, setMessage] = useState("");
   const navigate = useNavigate();
+  const [otpRequested, setOtpRequested] = useState(false);
 
   const toggleOTPVisibility = () => {
     setShowOTPValue((prev) => !prev);
@@ -35,12 +36,51 @@ const SignInForm = ({ onSwitchToSignIn }: SignInFormProps) => {
       newErrors.email = "Invalid email format";
     }
 
-    if (!formData.otp.trim()) {
+    if (otpRequested && !formData.otp.trim()) {
       newErrors.otp = "OTP is required";
     }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
+  };
+
+  const handleGetOTP = async () => {
+    // Validate email only
+    const newErrors: Record<string, string> = {};
+    if (!formData.email.trim()) {
+      newErrors.email = "Email is required";
+      setErrors(newErrors);
+      return;
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      newErrors.email = "Invalid email format";
+      setErrors(newErrors);
+      return;
+    }
+    setErrors({});
+
+    try {
+      const response = await fetch(
+        `${API_URL}/api/auth/request-login-otp`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ email: formData.email }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setMessage("OTP sent to your email!");
+        setOtpRequested(true);
+      } else {
+        setMessage(data.message || "Failed to send OTP");
+      }
+    } catch (error) {
+      setMessage("An error occurred. Please try again.");
+    }
   };
 
   const handleSignIn = async () => {
@@ -138,35 +178,37 @@ const SignInForm = ({ onSwitchToSignIn }: SignInFormProps) => {
             )}
           </div>
 
-          <div className="relative">
-            <label className="block text-[14px] text-[#969696] mb-1 absolute left-2.5 -top-2.5 px-1 z-10 bg-white">
-              OTP
-            </label>
+          {otpRequested && (
             <div className="relative">
-              <input
-                type={showOTPValue ? "text" : "password"}
-                placeholder="Enter OTP"
-                value={formData.otp}
-                onChange={(e) =>
-                  setFormData({ ...formData, otp: e.target.value })
-                }
-                className="w-full px-4 py-3 border border-[#E6E6E6] rounded-lg text-[16px]"
-              />
+              <label className="block text-[14px] text-[#969696] mb-1 absolute left-2.5 -top-2.5 px-1 z-10 bg-white">
+                OTP
+              </label>
+              <div className="relative">
+                <input
+                  type={showOTPValue ? "text" : "password"}
+                  placeholder="Enter OTP"
+                  value={formData.otp}
+                  onChange={(e) =>
+                    setFormData({ ...formData, otp: e.target.value })
+                  }
+                  className="w-full px-4 py-3 border border-[#E6E6E6] rounded-lg text-[16px]"
+                />
 
-              {showOTPValue ? (
-                <EyeClosed
-                  onClick={toggleOTPVisibility}
-                  className="absolute right-3 top-3 w-5 h-5 text-gray-400 cursor-pointer"
-                />
-              ) : (
-                <Eye
-                  onClick={toggleOTPVisibility}
-                  className="absolute right-3 top-3 w-5 h-5 text-gray-400 cursor-pointer"
-                />
-              )}
+                {showOTPValue ? (
+                  <EyeClosed
+                    onClick={toggleOTPVisibility}
+                    className="absolute right-3 top-3 w-5 h-5 text-gray-400 cursor-pointer"
+                  />
+                ) : (
+                  <Eye
+                    onClick={toggleOTPVisibility}
+                    className="absolute right-3 top-3 w-5 h-5 text-gray-400 cursor-pointer"
+                  />
+                )}
+              </div>
+              {errors.otp && <p className="text-red-500 text-sm">{errors.otp}</p>}
             </div>
-            {errors.otp && <p className="text-red-500 text-sm">{errors.otp}</p>}
-          </div>
+          )}
           {message && (
             <p className="text-center text-green-600/80 text-sm">{message}</p>
           )}
@@ -182,20 +224,22 @@ const SignInForm = ({ onSwitchToSignIn }: SignInFormProps) => {
               />
               <span className="text-sm text-gray-600">Keep me logged in</span>
             </label>
-            <button
-              onClick={handleResendOTP}
-              className="text-sm text-blue-600 hover:underline cursor-pointer"
-            >
-              Resend OTP
-            </button>
+            {otpRequested && (
+              <button
+                onClick={handleResendOTP}
+                className="text-sm text-blue-600 hover:underline cursor-pointer"
+              >
+                Resend OTP
+              </button>
+            )}
           </div>
 
           {/* Buttons */}
           <button
-            onClick={handleSignIn}
+            onClick={otpRequested ? handleSignIn : handleGetOTP}
             className="w-full bg-[#1677FF] text-white py-3 cursor-pointer rounded-lg font-medium hover:bg-[#1666dd] transition-colors"
           >
-            Sign in
+            {otpRequested ? "Sign in" : "Get OTP"}
           </button>
 
           <div className="text-center text-[14px] text-[#969696]">

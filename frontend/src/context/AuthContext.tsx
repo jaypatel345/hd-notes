@@ -14,9 +14,9 @@ export const AuthProvider = ({ children }: { children: ReactNode }) => {
   // Temporary default user for development so Dashboard can render without sign-in
   const [user, setUser] = useState<User | null>({
     id: "1",
-    name: "Jay Patel",
-    email: "jay@example.com",
-    dateOfBirth: "2000-01-01",
+    name: "xyz",
+    email: "example@gmail.com",
+    dateOfBirth: "",
   });
 
   const signin = (user: User) => setUser(user);
